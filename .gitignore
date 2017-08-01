@@ -1,0 +1,8 @@
+*.suo
+*.exe
+*.pdb
+*.config
+*.manifest
+*.cache
+xTsGetter/bin/
+xTsGetter/obj/
