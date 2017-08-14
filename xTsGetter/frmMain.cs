@@ -14,6 +14,7 @@ using Microsoft.VisualBasic;
 //this application is used to download ts files from several web sites
 //==============================================================================================================
 //history:
+//	2017.08.14: version 1.0.0.6: add condition handler to deal with the video isn't a javynow source, just skip it.
 //	2017.08.01: version 1.0.0.5: add an inputbox to ask people what's password of the remote database, actually for putting the whole source code onto github.com with some extent of safety
 //	2017.07.31: version 1.0.0.4: modify the function getM3u8Path to be able to accept a new kind of symbol "307721_dashinit"
 //	2017.07.24: version 1.0.0.3: add mimized box
@@ -117,17 +118,21 @@ namespace xTsGetter
 			HtmlElement eleB = objWB.Document.Body;
 			string s = e.Url.ToString();
 			string iFrameSrc = "";
-			//case 1: nukistream, poyopara
 			if ((s.IndexOf("nukistream") > 0) || (s.IndexOf("poyopara") > 0) || (s.IndexOf("iqoo") > 0) || (s.IndexOf("hikaritube") > 0)) {
-				//case 1.1: javynow embedded
+				//check javynow embedded
 				eleA = objWB.Document.All["player"];
 				if (eleA != null) {
+					//focus on javy videos only, that's a lot of thme already, skip the rest
 					if (eleA.InnerHtml.IndexOf("javynow") > 0) {
 						eleB = eleA.Children[0].Children[0];
 						iFrameSrc = eleB.GetAttribute("src").ToString();
 						//browse the target source
 						IE2JavyNow.Navigate(iFrameSrc);
 						return;
+					} else {
+						//not javynow, delete thsi one and move on
+						GetIt(@website + @"delRec.php?tblname=flv&id=" + curID.ToString() + "&dbpwd=" + dbpwd);
+						nextURLDecode();
 					}
 				}
 			}
